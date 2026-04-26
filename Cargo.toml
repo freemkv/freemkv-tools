@@ -1,0 +1,14 @@
+[package]
+name = "freemkv-tools"
+version = "0.13.21"
+edition = "2024"
+license = "AGPL-3.0-only"
+description = "Diagnostic + operator toolkit for libfreemkv (debug-tier; not for end users)"
+repository = "https://github.com/freemkv/freemkv-tools"
+
+[[bin]]
+name = "freemkv-tools"
+path = "src/main.rs"
+
+[dependencies]
+libfreemkv = "0.13.21"
