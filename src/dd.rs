@@ -90,20 +90,14 @@ impl Args {
                 "skip" => a.skip = v.parse().map_err(|_| format!("bad skip: {}", v))?,
                 "count" => a.count = v.parse().map_err(|_| format!("bad count: {}", v))?,
                 "bpt" => a.bpt = v.parse().map_err(|_| format!("bad bpt: {}", v))?,
-                "timeout" => {
-                    a.timeout_ms = v.parse().map_err(|_| format!("bad timeout: {}", v))?
-                }
+                "timeout" => a.timeout_ms = v.parse().map_err(|_| format!("bad timeout: {}", v))?,
                 "pause" => a.pause_ms = v.parse().map_err(|_| format!("bad pause: {}", v))?,
                 "unlock" => a.unlock = bool_flag(v).map_err(|_| format!("bad unlock: {}", v))?,
                 "recovery" => {
                     a.recovery = bool_flag(v).map_err(|_| format!("bad recovery: {}", v))?
                 }
-                "retries" => {
-                    a.retries = v.parse().map_err(|_| format!("bad retries: {}", v))?
-                }
-                "verbose" => {
-                    a.verbose = v.parse().map_err(|_| format!("bad verbose: {}", v))?
-                }
+                "retries" => a.retries = v.parse().map_err(|_| format!("bad retries: {}", v))?,
+                "verbose" => a.verbose = v.parse().map_err(|_| format!("bad verbose: {}", v))?,
                 _ => return Err(format!("unknown key: {}", k)),
             }
         }
@@ -235,12 +229,10 @@ pub fn run(argv: &[String]) -> Result<(), String> {
         let buf_slice = &mut buf[..bytes];
 
         let cdb_t0 = Instant::now();
-        let res = drive.scsi_mut().execute(
-            &cdb,
-            DataDirection::FromDevice,
-            buf_slice,
-            args.timeout_ms,
-        );
+        let res =
+            drive
+                .scsi_mut()
+                .execute(&cdb, DataDirection::FromDevice, buf_slice, args.timeout_ms);
         let elapsed_ms = cdb_t0.elapsed().as_millis();
 
         match res {
