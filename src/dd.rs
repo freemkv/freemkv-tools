@@ -258,13 +258,16 @@ pub fn run(argv: &[String]) -> Result<(), String> {
             Err(libfreemkv::Error::ScsiError {
                 opcode,
                 status,
-                sense_key,
+                sense,
             }) => {
                 err_cdbs += 1;
                 if args.verbose >= 1 {
+                    let (sk, asc, ascq) = sense
+                        .map(|s| (s.sense_key, s.asc, s.ascq))
+                        .unwrap_or((0, 0, 0));
                     println!(
-                        "[{:5}] lba={:>10} cnt={:>3} ERR opcode=0x{:02x} status=0x{:02x} sense_key={:>2} elapsed={:>6}ms",
-                        i, lba, count, opcode, status, sense_key, elapsed_ms
+                        "[{:5}] lba={:>10} cnt={:>3} ERR opcode=0x{:02x} status=0x{:02x} sense_key={:>2} asc=0x{:02x} ascq=0x{:02x} elapsed={:>6}ms",
+                        i, lba, count, opcode, status, sk, asc, ascq, elapsed_ms
                     );
                 }
             }
