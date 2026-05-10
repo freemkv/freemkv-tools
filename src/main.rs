@@ -2,9 +2,11 @@
 // AGPL-3.0 — freemkv project
 //
 // Subcommands:
-//   dd               sg_dd-style raw sector reader using libfreemkv's Drive API
-//   labels-analyze   run the BD-J label parsers against a disc image; emit JSON
-//   labels-extract   dump the /BDMV/ tree from a disc image to a directory
+//   dd                     sg_dd-style raw sector reader using libfreemkv's Drive API
+//   labels-analyze         run the BD-J label parsers against a disc image; emit JSON
+//   labels-extract         dump the /BDMV/ tree from a disc image to a directory
+//   labels-corpus-check    regression-diff a directory of disc captures against
+//                          per-disc *.snapshot.json ground truth
 //
 // All subcommands go through the same Drive::open / init / read path the rip
 // pipeline uses, so observed behaviour is real production behaviour at the
@@ -12,6 +14,7 @@
 
 mod dd;
 mod labels_analyze;
+mod labels_corpus_check;
 mod labels_extract;
 
 fn main() {
@@ -42,6 +45,13 @@ fn main() {
                 std::process::exit(1);
             }
         },
+        "labels-corpus-check" => match labels_corpus_check::run(&args[2..]) {
+            Ok(()) => {}
+            Err(e) => {
+                eprintln!("labels-corpus-check: {}", e);
+                std::process::exit(1);
+            }
+        },
         "version" | "--version" | "-V" => println!("{}", env!("CARGO_PKG_VERSION")),
         "help" | "--help" | "-h" => usage(),
         other => {
@@ -58,11 +68,12 @@ fn usage() {
     println!("operator + debug toolkit for libfreemkv (NOT for end users)");
     println!();
     println!("Subcommands:");
-    println!("  dd               raw sector read via libfreemkv (sg_dd-like)");
-    println!("  labels-analyze   run BD-J label parsers against a disc image; emit JSON");
-    println!("  labels-extract   dump /BDMV/ tree from a disc image to a directory");
-    println!("  version          print crate version");
-    println!("  help             this message");
+    println!("  dd                     raw sector read via libfreemkv (sg_dd-like)");
+    println!("  labels-analyze         run BD-J label parsers against a disc image; emit JSON");
+    println!("  labels-extract         dump /BDMV/ tree from a disc image to a directory");
+    println!("  labels-corpus-check    regression-diff a corpus of disc captures vs snapshots");
+    println!("  version                print crate version");
+    println!("  help                   this message");
     println!();
     println!("Run a subcommand with --help for its arguments.");
 }
