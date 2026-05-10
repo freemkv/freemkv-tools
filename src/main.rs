@@ -4,6 +4,7 @@
 // Subcommands:
 //   dd               sg_dd-style raw sector reader using libfreemkv's Drive API
 //   labels-analyze   run the BD-J label parsers against a disc image; emit JSON
+//   labels-extract   dump the /BDMV/ tree from a disc image to a directory
 //
 // All subcommands go through the same Drive::open / init / read path the rip
 // pipeline uses, so observed behaviour is real production behaviour at the
@@ -11,6 +12,7 @@
 
 mod dd;
 mod labels_analyze;
+mod labels_extract;
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
@@ -33,6 +35,13 @@ fn main() {
                 std::process::exit(1);
             }
         },
+        "labels-extract" => match labels_extract::run(&args[2..]) {
+            Ok(()) => {}
+            Err(e) => {
+                eprintln!("labels-extract: {}", e);
+                std::process::exit(1);
+            }
+        },
         "version" | "--version" | "-V" => println!("{}", env!("CARGO_PKG_VERSION")),
         "help" | "--help" | "-h" => usage(),
         other => {
@@ -51,6 +60,7 @@ fn usage() {
     println!("Subcommands:");
     println!("  dd               raw sector read via libfreemkv (sg_dd-like)");
     println!("  labels-analyze   run BD-J label parsers against a disc image; emit JSON");
+    println!("  labels-extract   dump /BDMV/ tree from a disc image to a directory");
     println!("  version          print crate version");
     println!("  help             this message");
     println!();
