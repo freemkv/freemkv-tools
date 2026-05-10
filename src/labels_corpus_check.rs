@@ -269,6 +269,7 @@ fn build_analysis_json(path: &Path) -> Result<Value, String> {
 
     Ok(json!({
         "parser": result.parser,
+        "confidence": result.confidence.map(|c| format!("{:?}", c)),
         "parsers_detected": result.parsers_detected,
         "audio_count": result.labels.iter().filter(|l| l.stream_type == StreamLabelType::Audio).count(),
         "subtitle_count": result.labels.iter().filter(|l| l.stream_type == StreamLabelType::Subtitle).count(),
@@ -327,6 +328,7 @@ fn diff_structural(want: &Value, got: &Value) -> Vec<String> {
 
     for key in [
         "parser",
+        "confidence",
         "parsers_detected",
         "audio_count",
         "subtitle_count",

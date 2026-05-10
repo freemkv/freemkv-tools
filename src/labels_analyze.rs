@@ -84,6 +84,7 @@ pub fn run(argv: &[String]) -> Result<(), String> {
     let out = serde_json::json!({
         "image_path": path_str,
         "parser": result.parser,
+        "confidence": result.confidence.map(|c| format!("{:?}", c)),
         "parsers_detected": result.parsers_detected,
         "audio_count": audio_count,
         "subtitle_count": subtitle_count,
