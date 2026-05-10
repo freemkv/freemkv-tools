@@ -2,13 +2,15 @@
 // AGPL-3.0 — freemkv project
 //
 // Subcommands:
-//   dd      sg_dd-style raw sector reader using libfreemkv's Drive API
+//   dd               sg_dd-style raw sector reader using libfreemkv's Drive API
+//   labels-analyze   run the BD-J label parsers against a disc image; emit JSON
 //
 // All subcommands go through the same Drive::open / init / read path the rip
 // pipeline uses, so observed behaviour is real production behaviour at the
 // transport layer (not a parallel implementation that could drift).
 
 mod dd;
+mod labels_analyze;
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
@@ -21,6 +23,13 @@ fn main() {
             Ok(()) => {}
             Err(e) => {
                 eprintln!("dd: {}", e);
+                std::process::exit(1);
+            }
+        },
+        "labels-analyze" => match labels_analyze::run(&args[2..]) {
+            Ok(()) => {}
+            Err(e) => {
+                eprintln!("labels-analyze: {}", e);
                 std::process::exit(1);
             }
         },
@@ -40,9 +49,10 @@ fn usage() {
     println!("operator + debug toolkit for libfreemkv (NOT for end users)");
     println!();
     println!("Subcommands:");
-    println!("  dd       raw sector read via libfreemkv (sg_dd-like)");
-    println!("  version  print crate version");
-    println!("  help     this message");
+    println!("  dd               raw sector read via libfreemkv (sg_dd-like)");
+    println!("  labels-analyze   run BD-J label parsers against a disc image; emit JSON");
+    println!("  version          print crate version");
+    println!("  help             this message");
     println!();
     println!("Run a subcommand with --help for its arguments.");
 }
