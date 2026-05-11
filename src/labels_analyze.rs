@@ -23,7 +23,7 @@
 //!   freemkv-tools labels-analyze /srv/autorip/labels-corpus/disc-07.bin > disc-07.json
 
 use libfreemkv::FileSectorReader;
-use libfreemkv::labels::{StreamLabelType, analyze};
+use libfreemkv::labels::{StreamLabelType, analyze, clpi_audit};
 use libfreemkv::read_filesystem;
 use std::path::Path;
 
@@ -107,6 +107,19 @@ pub fn run(argv: &[String]) -> Result<(), String> {
         })
         .collect();
 
+    // CLPI vs MPLS cross-validation audit. Diagnostic only — purely
+    // surfaces "do these two data sources agree on what's on this
+    // disc?" for the user. Doesn't affect the labels output.
+    let audit = clpi_audit::audit(&mut reader, &udf);
+    let (clpi_only, mpls_only, matches, divergent) = audit.class_counts();
+    let audit_json = serde_json::json!({
+        "matches": matches,
+        "clpi_only": clpi_only,
+        "mpls_only": mpls_only,
+        "divergent": divergent,
+        "total_pids": audit.rows.len(),
+    });
+
     let out = serde_json::json!({
         "image_path": path_str,
         "parser": result.parser,
@@ -120,6 +133,7 @@ pub fn run(argv: &[String]) -> Result<(), String> {
         "disc_metadata": disc_metadata_json,
         "gap_fill_added": result.gap_fill_added,
         "chapter_summary": chapters_json,
+        "clpi_vs_mpls_audit": audit_json,
     });
     println!(
         "{}",
