@@ -81,6 +81,16 @@ pub fn run(argv: &[String]) -> Result<(), String> {
         })
         .collect();
 
+    // bdmt disc-level metadata: localized titles, disc-set position.
+    // Orthogonal to per-stream labels; always surface when present.
+    let disc_metadata_json = result.disc_metadata.as_ref().map(|m| {
+        serde_json::json!({
+            "titles": m.titles,
+            "descriptions": m.descriptions,
+            "disc_number": m.disc_number.map(|(n, total)| serde_json::json!([n, total])),
+        })
+    });
+
     let out = serde_json::json!({
         "image_path": path_str,
         "parser": result.parser,
@@ -91,6 +101,7 @@ pub fn run(argv: &[String]) -> Result<(), String> {
         "jar_inventory": result.jar_inventory,
         "raw_codes": raw_codes,
         "labels": labels_json,
+        "disc_metadata": disc_metadata_json,
     });
     println!(
         "{}",
