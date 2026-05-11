@@ -91,6 +91,22 @@ pub fn run(argv: &[String]) -> Result<(), String> {
         })
     });
 
+    // Per-playlist chapter summary (chapter count + approximate
+    // duration in seconds, sourced from MPLS PlaylistMark entries).
+    // Useful for identifying the "main feature" playlist at a glance
+    // — typically the one with the longest duration.
+    let chapters_json: Vec<_> = result
+        .chapter_summary
+        .iter()
+        .map(|c| {
+            serde_json::json!({
+                "playlist": c.playlist,
+                "chapter_count": c.chapter_count,
+                "duration_secs": c.duration_secs,
+            })
+        })
+        .collect();
+
     let out = serde_json::json!({
         "image_path": path_str,
         "parser": result.parser,
@@ -102,6 +118,8 @@ pub fn run(argv: &[String]) -> Result<(), String> {
         "raw_codes": raw_codes,
         "labels": labels_json,
         "disc_metadata": disc_metadata_json,
+        "gap_fill_added": result.gap_fill_added,
+        "chapter_summary": chapters_json,
     });
     println!(
         "{}",
