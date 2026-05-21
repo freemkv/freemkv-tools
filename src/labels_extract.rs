@@ -13,7 +13,7 @@
 //!   <image>     disc image file (1 GB head capture or full ISO)
 //!   <out-dir>   directory to extract into; created if missing
 
-use libfreemkv::FileSectorReader;
+use libfreemkv::FileSectorSource;
 use libfreemkv::read_filesystem;
 use std::path::{Path, PathBuf};
 
@@ -28,7 +28,7 @@ pub fn run(argv: &[String]) -> Result<(), String> {
     let out_dir = PathBuf::from(&argv[1]);
     let image_path = Path::new(image_path_str);
 
-    let mut reader = FileSectorReader::open(image_path)
+    let mut reader = FileSectorSource::open(image_path)
         .map_err(|e| format!("open {}: {}", image_path_str, e))?;
     let udf = read_filesystem(&mut reader).map_err(|e| format!("udf read_filesystem: {:?}", e))?;
 

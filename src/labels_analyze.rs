@@ -22,7 +22,7 @@
 //!   freemkv-tools labels-analyze disc-01.bin
 //!   freemkv-tools labels-analyze /srv/autorip/labels-corpus/disc-07.bin > disc-07.json
 
-use libfreemkv::FileSectorReader;
+use libfreemkv::FileSectorSource;
 use libfreemkv::labels::{StreamLabelType, analyze, clpi_audit};
 use libfreemkv::read_filesystem;
 use std::path::Path;
@@ -35,7 +35,7 @@ pub fn run(argv: &[String]) -> Result<(), String> {
     let path_str = &argv[0];
     let path = Path::new(path_str);
     let mut reader =
-        FileSectorReader::open(path).map_err(|e| format!("open {}: {}", path_str, e))?;
+        FileSectorSource::open(path).map_err(|e| format!("open {}: {}", path_str, e))?;
     let udf = read_filesystem(&mut reader).map_err(|e| format!("udf read_filesystem: {:?}", e))?;
     let result = analyze(&mut reader, &udf);
 
@@ -148,7 +148,7 @@ fn help_text() -> &'static str {
 Usage: freemkv-tools labels-analyze <image>
 
   <image>   disc image file (1 GB head-of-disc capture, full ISO,
-            or any file libfreemkv's FileSectorReader can mount)
+            or any file libfreemkv's FileSectorSource can mount)
 
 Output: JSON to stdout. Fields: parser (matched parser name or null),
 audio_count, subtitle_count, jar_inventory (filenames seen under

@@ -28,7 +28,7 @@
 //! detail blocks. Exits non-zero on any drift so the harness can gate
 //! CI.
 
-use libfreemkv::FileSectorReader;
+use libfreemkv::FileSectorSource;
 use libfreemkv::labels::{StreamLabelType, analyze};
 use libfreemkv::read_filesystem;
 use serde_json::{Value, json};
@@ -243,7 +243,7 @@ fn walk(dir: &Path, out: &mut Vec<PathBuf>, filter: Option<&str>) -> Result<(), 
 
 fn build_analysis_json(path: &Path) -> Result<Value, String> {
     let mut reader =
-        FileSectorReader::open(path).map_err(|e| format!("open {}: {}", path.display(), e))?;
+        FileSectorSource::open(path).map_err(|e| format!("open {}: {}", path.display(), e))?;
     let udf = read_filesystem(&mut reader).map_err(|e| format!("udf: {:?}", e))?;
     let result = analyze(&mut reader, &udf);
 

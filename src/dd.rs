@@ -16,7 +16,7 @@
 //!   bpt=N          sectors per SCSI READ command; default 32 (matches our rip pipeline)
 //!   timeout=MS     SG_IO timeout per CDB in milliseconds; default 30000
 //!   pause=MS       sleep between commands in milliseconds; default 0
-//!   unlock=0|1     run `Drive::init` to unlock LibreDrive firmware; default 1
+//!   unlock=0|1     run `Drive::init` to unlock drive firmware (alternate read mode); default 1
 //!   recovery=0|1   pass `recovery=true` to Drive::read (= 60 s timeout flag); default 0
 //!   retries=N      hammer the SAME LBA N+1 times; each attempt counted as
 //!                  a separate CDB; ignores count/bpt advancement. Use this to
@@ -137,7 +137,7 @@ Usage: freemkv-tools dd if=DEV [of=PATH] [skip=LBA] [count=N] [bpt=N]
   bpt=32          sectors per SCSI READ command
   timeout=30000   per-CDB timeout (ms)
   pause=0         sleep between CDBs (ms)
-  unlock=1        run Drive::init() to unlock LibreDrive
+  unlock=1        run Drive::init() to unlock drive firmware
   recovery=0      pass recovery=true to Drive::read
   verbose=1       0=summary only; 1=per-CDB; 2=+sense; 3=+raw"
 }
